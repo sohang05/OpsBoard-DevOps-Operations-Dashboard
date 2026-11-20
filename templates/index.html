@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpsBoard — DevOps Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#090b12;--panel:#111522;--panel2:#151b2b;--line:#252d40;--text:#edf1fb;--muted:#8791a8;--purple:#9b8cff;--cyan:#65d9e8;--green:#55d6a1;--red:#ff7185;--amber:#f5bd65}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% -15%,#27204b 0,transparent 38%),var(--bg);color:var(--text);font:14px 'DM Sans',sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:100vh}
+.sidebar{border-right:1px solid var(--line);padding:27px 17px;background:#0d101a;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:11px;padding:0 10px 34px;font:700 20px 'Space Grotesk',sans-serif;letter-spacing:-.6px}
+.brand-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#a38bff,#5d73ef);display:grid;place-items:center;color:white;font-weight:700;box-shadow:0 6px 22px #806cff44}
+.brand em{font-style:normal;color:var(--purple)}
+.nav-label{color:#59647c;text-transform:uppercase;letter-spacing:1.4px;font-size:10px;font-weight:700;padding:0 12px 10px}
+.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#9ca6bb;text-align:left;padding:11px 12px;border-radius:9px;display:flex;align-items:center;gap:12px;font-weight:600}
+.nav button:hover,.nav button.active{background:#211e38;color:#c5baff}.nav .ico{width:18px;text-align:center;font-size:16px}
+.sidebar-bottom{margin-top:auto;border:1px solid var(--line);border-radius:12px;padding:14px;background:linear-gradient(145deg,#171b2b,#111522)}
+.sidebar-bottom strong{display:block;font-size:12px;margin-bottom:6px}.sidebar-bottom p{color:var(--muted);font-size:11px;line-height:1.5;margin:0}
+.main{padding:32px clamp(20px,4vw,58px);max-width:1500px;width:100%;margin:auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:32px}
+.eyebrow{color:var(--purple);font-size:11px;text-transform:uppercase;letter-spacing:1.8px;font-weight:700;margin-bottom:7px}
+h1{font:600 clamp(25px,3vw,34px) 'Space Grotesk',sans-serif;letter-spacing:-1px;margin:0}
+.subtitle{color:var(--muted);margin:7px 0 0}
+.top-right{display:flex;align-items:center;gap:12px}.date-chip{border:1px solid var(--line);background:#111522;padding:10px 13px;border-radius:9px;color:#aab4c8;font-size:12px}
+.primary{background:linear-gradient(135deg,#9d8bff,#7768e8);border:0;border-radius:9px;color:white;padding:11px 16px;font-weight:700;box-shadow:0 6px 20px #806cff30}.primary:hover{filter:brightness(1.1)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.stat{background:linear-gradient(145deg,#151a29,#101420);border:1px solid var(--line);border-radius:13px;padding:18px;position:relative;overflow:hidden}
+.stat:after{content:"";position:absolute;width:80px;height:80px;border-radius:50%;right:-28px;top:-35px;background:var(--glow);filter:blur(30px);opacity:.22}
+.stat-head{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px;font-weight:600}.stat-icon{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--tint);color:var(--accent)}
+.stat-num{font:700 29px 'Space Grotesk',sans-serif;margin-top:12px}.stat-foot{font-size:11px;color:var(--muted);margin-top:3px}
+.overview{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:26px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:19px}
+.panel-title{font:600 14px 'Space Grotesk',sans-serif}.panel-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.progress-top{display:flex;justify-content:space-between;align-items:center}.percent{font:700 25px 'Space Grotesk',sans-serif;color:var(--green)}
+.progress-track{height:8px;background:#252c3d;border-radius:10px;overflow:hidden;margin:19px 0 13px}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#8e7cff,#56d5ad);border-radius:10px;transition:width .3s}
+.legend{display:flex;gap:20px;flex-wrap:wrap;color:var(--muted);font-size:11px}.legend span{display:flex;align-items:center;gap:7px}.dot{height:7px;width:7px;border-radius:50%;display:inline-block}
+.overdue-box{display:flex;align-items:center;gap:14px;margin-top:15px}.overdue-number{font:700 30px 'Space Grotesk',sans-serif;color:var(--red)}.overdue-text{font-size:12px;color:var(--muted);line-height:1.5}
+.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:14px;gap:14px}.section-head h2{font:600 18px 'Space Grotesk',sans-serif;margin:0}.section-head p{font-size:11px;color:var(--muted);margin:5px 0 0}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+.control{background:#111522;border:1px solid var(--line);color:#c9d1e2;border-radius:8px;padding:9px 11px;outline:none}.control:focus{border-color:#8274e8}.search{min-width:210px;flex:1}
+.table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:13px;overflow:hidden}
+table{width:100%;border-collapse:collapse;text-align:left}th{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#69758e;font-weight:700;background:#131827;padding:14px 17px}td{padding:15px 17px;border-top:1px solid #20283a;color:#cbd3e3;font-size:12px}tbody tr:hover{background:#151b2b}
+.task-title{font-weight:600;color:#e7ebf6;font-size:13px}.task-desc{color:#79859d;font-size:11px;margin-top:4px;max-width:400px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:30px;padding:5px 9px;font-size:10px;font-weight:700;white-space:nowrap}
+.status-todo{color:#a9b4c9;background:#293246}.status-in_progress{color:#8fd8ed;background:#173746}.status-completed{color:#73dfb0;background:#15382f}
+.priority-low{color:#aeb9cd;background:#283144}.priority-medium{color:#f1c978;background:#40351f}.priority-high{color:#ffa77c;background:#462b22}.priority-critical{color:#ff8293;background:#482532}
+.category{color:#b9aaff;background:#292342;padding:5px 8px;border-radius:6px;font-size:10px;font-weight:600}
+.due{color:#9aa5ba}.due.overdue{color:var(--red)}.actions{display:flex;gap:6px}.icon-btn{background:#20283a;color:#b7c1d4;border:1px solid #303a50;border-radius:7px;padding:6px 8px}.icon-btn:hover{background:#302b4b;color:#d3caff}
+.empty{text-align:center;padding:42px 15px;color:var(--muted)}
+.footer{display:flex;justify-content:space-between;color:#59647a;font-size:10px;padding:13px 3px}
+.modal-backdrop{position:fixed;inset:0;background:#050710c9;display:none;place-items:center;padding:18px;z-index:5}.modal-backdrop.show{display:grid}
+.modal{width:min(510px,100%);background:#151a29;border:1px solid #343d55;border-radius:15px;padding:23px;box-shadow:0 25px 90px #0009}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal-head h2{font:600 19px 'Space Grotesk';margin:0}.close{border:0;background:#252c3d;color:#aab5ca;border-radius:7px;padding:7px 10px}
+.field{display:grid;gap:7px;margin-bottom:14px}.field label{font-size:11px;color:#9da8bd;font-weight:700}.field input,.field select,.field textarea{width:100%;background:#0e1320;border:1px solid #303a50;color:#eaf0fc;border-radius:8px;padding:11px;outline:none}.field textarea{resize:vertical;min-height:75px}.field input:focus,.field select:focus,.field textarea:focus{border-color:#8d7bf5}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal-actions{display:flex;justify-content:end;gap:9px;margin-top:20px}.secondary{background:#242c3d;color:#bdc7d9;border:1px solid #374158;border-radius:8px;padding:10px 14px}
+.toast{position:fixed;right:24px;bottom:24px;background:#172b28;border:1px solid #28634f;color:#8ce4bd;padding:12px 17px;border-radius:9px;opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none;z-index:10}.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:900px){.app{grid-template-columns:68px minmax(0,1fr)}.sidebar{padding:22px 9px}.brand{padding:0 7px 32px}.brand-name,.nav-label,.nav-text,.sidebar-bottom{display:none}.nav button{justify-content:center;padding:12px 5px}.overview{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.main{padding:22px 14px}.topbar{align-items:flex-start;flex-direction:column}.top-right{width:100%;justify-content:space-between}.stats{gap:8px}.stat{padding:13px}.stat-num{font-size:24px}.table-wrap{overflow-x:auto}table{min-width:720px}.section-head{align-items:flex-start;flex-direction:column}.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">O</div><span class="brand-name">ops<em>board</em></span></div>
+  <div class="nav-label">Workspace</div>
+  <nav class="nav">
+    <button class="active" data-view="all"><span class="ico">◫</span><span class="nav-text">Overview</span></button>
+    <button data-view="todo"><span class="ico">◷</span><span class="nav-text">To do</span></button>
+    <button data-view="in_progress"><span class="ico">◉</span><span class="nav-text">In progress</span></button>
+    <button data-view="completed"><span class="ico">✓</span><span class="nav-text">Completed</span></button>
+  </nav>
+  <div class="nav-label" style="margin-top:30px">Engineering</div>
+  <nav class="nav">
+    <button data-category="AWS"><span class="ico">☁</span><span class="nav-text">AWS</span></button>
+    <button data-category="Jenkins"><span class="ico">⚙</span><span class="nav-text">Jenkins</span></button>
+    <button data-category="Docker"><span class="ico">▣</span><span class="nav-text">Docker</span></button>
+    <button data-category="Kubernetes"><span class="ico">◈</span><span class="nav-text">Kubernetes</span></button>
+  </nav>
+  <div class="sidebar-bottom"><strong>Build. Ship. Operate.</strong><p>Your engineering workspace for tracking infrastructure, automation and deployment work.</p></div>
+</aside>
+<main class="main">
+  <header class="topbar">
+    <div><div class="eyebrow">Engineering workspace / Overview</div><h1>Good work starts with a plan.</h1><p class="subtitle">Your DevOps activity, all in one place.</p></div>
+    <div class="top-right"><div class="date-chip" id="today-label"></div><button class="primary" id="open-modal">＋ &nbsp; New task</button></div>
+  </header>
+
+  <section class="stats">
+    <article class="stat" style="--glow:#9b8cff;--tint:#292342;--accent:#b9aaff"><div class="stat-head">Total tasks <span class="stat-icon">▤</span></div><div class="stat-num" id="total-count">—</div><div class="stat-foot">Across all workstreams</div></article>
+    <article class="stat" style="--glow:#65d9e8;--tint:#173746;--accent:#8fd8ed"><div class="stat-head">In progress <span class="stat-icon">◉</span></div><div class="stat-num" id="progress-count">—</div><div class="stat-foot">Currently being worked on</div></article>
+    <article class="stat" style="--glow:#55d6a1;--tint:#15382f;--accent:#73dfb0"><div class="stat-head">Completed <span class="stat-icon">✓</span></div><div class="stat-num" id="completed-count">—</div><div class="stat-foot">Successfully finished</div></article>
+    <article class="stat" style="--glow:#ff7185;--tint:#482532;--accent:#ff8293"><div class="stat-head">Overdue <span class="stat-icon">!</span></div><div class="stat-num" id="overdue-count">—</div><div class="stat-foot">Needs your attention</div></article>
+  </section>
+
+  <section class="overview">
+    <div class="panel">
+      <div class="progress-top"><div><div class="panel-title">Overall progress</div><div class="panel-sub">Completion across all your tasks</div></div><div class="percent" id="completion-rate">0%</div></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="legend"><span><i class="dot" style="background:#9b8cff"></i><b id="todo-legend">0</b> To do</span><span><i class="dot" style="background:#65d9e8"></i><b id="progress-legend">0</b> In progress</span><span><i class="dot" style="background:#55d6a1"></i><b id="completed-legend">0</b> Completed</span></div>
+    </div>
+    <div class="panel"><div class="panel-title">Attention required</div><div class="panel-sub">Tasks that have passed their due date</div><div class="overdue-box"><div class="overdue-number" id="overdue-callout">0</div><div class="overdue-text">overdue tasks<br>Review their priority and next steps.</div></div></div>
+  </section>
+
+  <section>
+    <div class="section-head"><div><h2 id="list-heading">All tasks</h2><p>Manage your engineering work and deployment activities.</p></div></div>
+    <div class="filters">
+      <input class="control search" id="search" placeholder="⌕  Search tasks...">
+      <select class="control" id="status-filter"><option value="">All statuses</option><option value="todo">To do</option><option value="in_progress">In progress</option><option value="completed">Completed</option></select>
+      <select class="control" id="category-filter"><option value="">All categories</option>{% for category in categories %}<option value="{{ category }}">{{ category }}</option>{% endfor %}</select>
+      <select class="control" id="priority-filter"><option value="">All priorities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Task</th><th>Category</th><th>Priority</th><th>Status</th><th>Due date</th><th>Actions</th></tr></thead><tbody id="task-rows"><tr><td colspan="6" class="empty">Loading tasks...</td></tr></tbody></table></div>
+    <div class="footer"><span>OPSBOARD · DEVOPS WORKSPACE</span><span id="last-updated">Connecting to task service…</span></div>
+  </section>
+</main>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <form class="modal" id="task-form">
+    <div class="modal-head"><h2 id="modal-title">Create a task</h2><button type="button" class="close" id="close-modal">✕</button></div>
+    <div class="field"><label for="task-title">TASK TITLE</label><input id="task-title" maxlength="120" placeholder="e.g. Deploy Flask app to ECS" required></div>
+    <div class="field"><label for="task-description">DESCRIPTION</label><textarea id="task-description" placeholder="Add details, acceptance criteria or notes..."></textarea></div>
+    <div class="two-col">
+      <div class="field"><label for="task-category">CATEGORY</label><select id="task-category">{% for category in categories %}<option value="{{ category }}">{{ category }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="task-priority">PRIORITY</label><select id="task-priority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="critical">Critical</option></select></div>
+    </div>
+    <div class="field"><label for="task-due">DUE DATE</label><input type="date" id="task-due"></div>
+    <div class="modal-actions"><button type="button" class="secondary" id="cancel-modal">Cancel</button><button class="primary" type="submit" id="save-task">Create task</button></div>
+  </form>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let currentView = "all";
+let editingId = null;
+let allTasks = [];
+
+$("today-label").textContent = new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function showToast(message) {
+  $("toast").textContent = message;
+  $("toast").classList.add("show");
+  setTimeout(() => $("toast").classList.remove("show"), 2400);
+}
+function niceStatus(status) {
+  return ({todo:"To do",in_progress:"In progress",completed:"Completed"})[status] || status;
+}
+function dueLabel(value, status) {
+  if (!value) return '<span class="due">No date</span>';
+  const d = new Date(value + "T00:00:00");
+  const overdue = value < new Date().toISOString().slice(0,10) && status !== "completed";
+  return `<span class="due ${overdue ? "overdue" : ""}">${overdue ? "⚠ " : ""}${d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}</span>`;
+}
+async function api(url, options={}) {
+  const response = await fetch(url,{headers:{"Content-Type":"application/json"},...options});
+  const data = await response.json().catch(()=>({}));
+  if (!response.ok) throw new Error(data.error || "Request failed");
+  return data;
+}
+async function loadStats() {
+  const s = await api("/api/stats");
+  $("total-count").textContent=s.total;
+  $("progress-count").textContent=s.in_progress;
+  $("completed-count").textContent=s.completed;
+  $("overdue-count").textContent=s.overdue;
+  $("overdue-callout").textContent=s.overdue;
+  $("completion-rate").textContent=s.completion_rate+"%";
+  $("progress-fill").style.width=s.completion_rate+"%";
+  $("todo-legend").textContent=s.todo;
+  $("progress-legend").textContent=s.in_progress;
+  $("completed-legend").textContent=s.completed;
+}
+async function loadTasks() {
+  const params = new URLSearchParams();
+  const search=$("search").value.trim();
+  const status=currentView !== "all" ? currentView : $("status-filter").value;
+  const category=$("category-filter").value;
+  if(search) params.set("search",search);
+  if(status) params.set("status",status);
+  if(category) params.set("category",category);
+  allTasks=await api("/api/tasks?"+params.toString());
+  const priority=$("priority-filter").value;
+  const shown=priority ? allTasks.filter(t=>t.priority===priority) : allTasks;
+  renderTasks(shown);
+  $("last-updated").textContent="Updated "+new Date().toLocaleTimeString();
+}
+function renderTasks(tasks) {
+  const body=$("task-rows");
+  if(!tasks.length){body.innerHTML='<tr><td colspan="6" class="empty">No tasks found. Create a task or adjust your filters.</td></tr>';return;}
+  body.innerHTML=tasks.map(t=>`
+    <tr>
+      <td><div class="task-title">${escapeHtml(t.title)}</div><div class="task-desc">${escapeHtml(t.description || "No description added")}</div></td>
+      <td><span class="category">${escapeHtml(t.category)}</span></td>
+      <td><span class="pill priority-${t.priority}">${t.priority.toUpperCase()}</span></td>
+      <td><select class="control" aria-label="Update status" onchange="changeStatus(${t.id},this.value)" style="padding:6px 8px;font-size:11px">
+        <option value="todo" ${t.status==="todo"?"selected":""}>To do</option>
+        <option value="in_progress" ${t.status==="in_progress"?"selected":""}>In progress</option>
+        <option value="completed" ${t.status==="completed"?"selected":""}>Completed</option>
+      </select></td>
+      <td>${dueLabel(t.due_date,t.status)}</td>
+      <td><div class="actions"><button class="icon-btn" title="Edit task" onclick="editTask(${t.id})">✎</button><button class="icon-btn" title="Delete task" onclick="removeTask(${t.id})">⌫</button></div></td>
+    </tr>`).join("");
+}
+async function refresh() { await Promise.all([loadStats(),loadTasks()]); }
+function openModal(task=null) {
+  editingId=task ? task.id : null;
+  $("modal-title").textContent=task ? "Edit task" : "Create a task";
+  $("save-task").textContent=task ? "Save changes" : "Create task";
+  $("task-title").value=task?.title || "";
+  $("task-description").value=task?.description || "";
+  $("task-category").value=task?.category || "AWS";
+  $("task-priority").value=task?.priority || "medium";
+  $("task-due").value=task?.due_date || "";
+  $("modal").classList.add("show");
+  $("task-title").focus();
+}
+function closeModal() {$("modal").classList.remove("show");$("task-form").reset();editingId=null;}
+$("open-modal").addEventListener("click",()=>openModal());
+$("close-modal").addEventListener("click",closeModal);
+$("cancel-modal").addEventListener("click",closeModal);
+$("modal").addEventListener("click",e=>{if(e.target===$("modal"))closeModal();});
+$("task-form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const payload={title:$("task-title").value,description:$("task-description").value,category:$("task-category").value,priority:$("task-priority").value,due_date:$("task-due").value || null};
+  try {
+    if(editingId) await api(`/api/tasks/${editingId}`,{method:"PATCH",body:JSON.stringify(payload)});
+    else await api("/api/tasks",{method:"POST",body:JSON.stringify(payload)});
+    closeModal();await refresh();showToast(editingId ? "Task updated" : "Task created");
+  } catch(err){showToast(err.message);}
+});
+async function changeStatus(id,status) {
+  try {await api(`/api/tasks/${id}`,{method:"PATCH",body:JSON.stringify({status})});await refresh();showToast("Task status updated");}
+  catch(err){showToast(err.message);}
+}
+function editTask(id) {const task=allTasks.find(t=>t.id===id);if(task)openModal(task);}
+async function removeTask(id) {
+  if(!confirm("Delete this task? This cannot be undone."))return;
+  try {await api(`/api/tasks/${id}`,{method:"DELETE"});await refresh();showToast("Task deleted");}
+  catch(err){showToast(err.message);}
+}
+$("search").addEventListener("input",()=>loadTasks().catch(e=>showToast(e.message)));
+["status-filter","category-filter","priority-filter"].forEach(id=>$(id).addEventListener("change",()=>{
+  if(id==="status-filter")currentView="all";
+  loadTasks().catch(e=>showToast(e.message));
+}));
+document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>{
+  document.querySelectorAll("[data-view],[data-category]").forEach(b=>b.classList.remove("active"));
+  button.classList.add("active");currentView=button.dataset.view;$("status-filter").value="";$("category-filter").value="";
+  $("list-heading").textContent=button.textContent.trim()+" tasks";loadTasks().catch(e=>showToast(e.message));
+}));
+document.querySelectorAll("[data-category]").forEach(button=>button.addEventListener("click",()=>{
+  document.querySelectorAll("[data-view],[data-category]").forEach(b=>b.classList.remove("active"));
+  button.classList.add("active");currentView="all";$("status-filter").value="";$("category-filter").value=button.dataset.category;
+  $("list-heading").textContent=button.dataset.category+" tasks";loadTasks().catch(e=>showToast(e.message));
+}));
+refresh().catch(err=>{showToast(err.message);$("task-rows").innerHTML='<tr><td colspan="6" class="empty">Could not connect to the task service.</td></tr>';});
+</script>
+</body>
+</html>
