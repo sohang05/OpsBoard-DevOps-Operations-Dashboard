@@ -2,7 +2,7 @@ pipeline
 
 agent {label 'OpsBoard'}
 
-stages{
+stages {
     stage('Install Docker'){
         steps {
             sh '''
